@@ -18,9 +18,10 @@ def playlist(sub, name, pid):
     elif user_in == "a":
         input_sname = input("Enter song name:")
         try:
-            sid =  mycursor.execute("select sid from Song where sname==%(input_sname)s", (input_sname))
+            mycursor.execute("select sID from Song where sName=='%s';"% (input_sname))
+            sid = mycursor.fetchall()
             # check if song already on playlist
-            if len(mycursor.execute("select sid from Is_On where pid==%(pid)d and sid==%(sid)d", (pid, sid))) > 0:
+            if len(mycursor.execute("select sID from Is_On where pID==%d and sID=%d;"% (pid, sid)).fetchall()) > 0:
                 print("Song Already In Playlist")
             else:
                 sub.add_song(pid, sid)
@@ -32,9 +33,10 @@ def playlist(sub, name, pid):
     elif user_in == "r":
         input_sname = input("Enter song name:")
         try:
-            sid =  mycursor.execute("select sid from Song where sname==%(input_sname)s", (input_sname))
+            mycursor.execute("select sID from Song where sName=='%s';"% (input_sname))
+            sid = mycursor.fetchall()
             # check if song is on playlist
-            if len(mycursor.execute("select sid from Is_On where pid==%(pid)d and sid==%(sid)d", (pid, sid))) == 0:
+            if len(mycursor.execute("select sID from Is_On where pID==%d and sID=%d;"% (pid, sid)).fetchall()) == 0:
                 print("Song Not In Playlist")
             else:
                 sub.remove_song(pid, sid)
@@ -80,14 +82,14 @@ def artist_home(sub, artist, aname, aid):
 def search():
     querry = input("Search: ")
     querry = '"' + querry + "%" + '"'
-    mycursor.execute("select sname from Song where sname like %(querry)s", (querry))
+    mycursor.execute("select sName from Song where sName like '%s';"% (querry))
     for x in mycursor:
         print(x)
     
 def a_search():
     querry = input("Search: ")
     querry = '"' + querry + "%" + '"'
-    mycursor.execute("select aname from Artist where aname like %(querry)s", (querry))
+    mycursor.execute("select aName from Artist where aName like '%s;'"% (querry))
     for x in mycursor:
         print(x)
     
@@ -99,7 +101,8 @@ def sub_menu(sub):
     user_in = user_in.lower()
     # run playlist menu for likes playlist
     if user_in == "l":
-        pid =  mycursor.execute('select pid from Playlist where pname=="Likes"')
+        mycursor.execute('select pID from Playlist where pName="Likes";')
+        pid = mycursor.fetchall()
         playlist(sub, "Likes", pid)
         sub_menu(sub)
     # list playlists
@@ -112,7 +115,8 @@ def sub_menu(sub):
         pname = input("Input Name of Playlist You Would Like to Edit: ")
         try:
             # find related id
-            pid =  mycursor.execute('select pid from Playlist where pname==%(pname)s', (pname))
+            mycursor.execute("select pID from Playlist where pName='%s';"% (pname))
+            pid = mycursor.fetchall()
             # run playist menu for input playlist
             playlist(sub, pname, pid)
         except Exception:
@@ -122,7 +126,7 @@ def sub_menu(sub):
     elif user_in == "ap":
         input_pname = input("Enter Playlist name:")
         try:
-            if len(mycursor.execute("select pid from Playlist where pname==%(pname)d", (pname)) > 0:
+            if len(mycursor.execute("select pID from Playlist where pName='%s';"% (pname)).fetchall()) > 0:
                 print("Name Already Taken")
             else:
                 sub.add_playlist(pname)
@@ -133,7 +137,7 @@ def sub_menu(sub):
     elif user_in == "ap":
         input_pname = input("Enter Playlist name:")
         try:
-            if len(mycursor.execute("select pid from Playlist where pname==%(pname)s", (pname))) == 0:
+            if len(mycursor.execute("select pID from Playlist where pName='%s';"% (pname)).fetchall()) == 0:
                 print("No Such Playlist")
             else:
                 sub.remove_playlist(pname)
@@ -145,14 +149,15 @@ def sub_menu(sub):
         search()
         sub_menu(sub)
     # search artists
-    elif user_in == "sa"
+    elif user_in == "sa":
         a_search()
         sub_menu(sub)
     # view artist home page
     elif user_in == "A":
         aname = input ("Enter Artist Name: ")
         try:
-            aid = mycursor.execute("select aid from Artist where aname==%(aname)s", (aname))
+            mycursor.execute("select aID from Artist where aName='%s';"% (aname))
+            aid = mycursor.fetchall()
             artist = Artist(aid, mycursor)
             artist_home(sub, artist, aname, aid)
         except Exception:
@@ -171,7 +176,7 @@ def sub_menu(sub):
     
 def artist_menu(artist):
     print('=== Artist Menu ===\n')
-    print("I - Info\nSL - Song List\nSI - Song Info\nA - Add Song\nR - Remove Song\nB - Back To Login\nX - Close Application\n" )
+    print("I - Info\nSL - Song List\nSI - Song Info\nA - Add Song\nR - Remove Song\nB - Back To Login\nX - Close Application\n;" )
     user_in = input("Input  Command: ")
     user_in = user_in.lower()
     if user_in == "I":
@@ -181,8 +186,9 @@ def artist_menu(artist):
     elif user_in == "si":
         input_sname = input("Enter song name:")
         try:
-            s_id =  mycursor.execute("select sid from Song where sname==%(input_sname)s", (input_sname))
-            artist.song_info()
+            mycursor.execute("select sID from Song where sName='%s';"% (input_sname))
+            sid = mycursor.fetchall()
+            artist.song_info(sid)
         except Exception:
             print("Song Not Found")
     elif user_in == "a":
@@ -194,9 +200,10 @@ def artist_menu(artist):
     elif user_in == "r":
         input_sname = input("Enter song name:")
         try:
-            s_id =  mycursor.execute("select sid from Song where sname==%(input_sname)s", (input_sname))
+            mycursor.execute("select sID from Song where sName='%s';"% (input_sname))
+            sid = mycursor.fetchall()
             try:
-                artist.song_info()
+                artist.song_info(sid)
             except Exception as e:
                 print(e)
         except Exception:
@@ -210,24 +217,27 @@ def artist_menu(artist):
         artist_menu(artist)
     
 def artist_start():
-    aname = input("Log In With Username: ")
-    a_id =  mycursor.execute("select subid from Subscriber where subname==%(aname)s", (aname))
-    artist = Artist(a_id, mycursor)
+    aname = input("Log In With Username or Exit: ")
+    mycursor.execute("select aID from artist where aName='%s';"% (aname))
+    aid = mycursor.fetchall()
+    print(aid)
+    artist = Artist(aid, mycursor)
     artist_menu(artist)
     
 def sub_start():
-    sname = input("Log In With Username: ")
-    sub_id =  mycursor.execute("select subid from Subscriber where subname==%(subname)s", (subname))
+    subname = input("Log In With Username or Exit: ")
+    mycursor.execute("select subID from subscriber where subName='%s';"% (subname))
+    sub_id =  mycursor.fetchall()
     sub = Subscriber(sub_id, mycursor)
     sub_menu(sub)
 
 def start():
     print("========== Welcome To Not Spotify ==========")
-    login_type = input("Type S for Subscriber login or A for Artist Login: ")
+    login_type = input("Type S for ubscriber login or A for Artist Login: ")
     login_type = login_type.lower()
     if login_type == "a":
         artist_start()
-    else if login_type == "s":
+    elif login_type == "s":
         sub_start()
     else:
         print("Unkown input")
