@@ -26,8 +26,10 @@ class Subscriber:
     
     # add input song to input playlist
     def add_song(self, pID, sID):
-        self.c.execute("insert into Is_On values (%s,'%s');"% (sID, pID))
+        print(sID, pID)
+        self.c.execute("insert into Is_On values ('%s','%s');"% (sID, pID))
         self.db.commit()
+        print("ok")
         self.c.execute("Select sName from Song where sID=%s"%(sID))
         s = self.c.fetchall()[0]
         self.c.execute("Select pName from Playlist where pID='%s'"%(pID))
@@ -128,7 +130,7 @@ if __name__ == "__main__":
     sub = Subscriber(1, mycursor, mydb)
     #sub.add_playlist("Fyre Beatz")
     sub.playlists()
-    sub.add_song("1FyreBeatz", 101)
+    sub.add_song('101WeRise',"1FyreBeatz")
     sub.list_songs("1FyreBeatz")
     sub.change_privacy("1FyreBeatz", "TRUE")
     sub.remove_song("1FyreBeatz", 101)
