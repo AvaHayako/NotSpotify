@@ -187,8 +187,8 @@ def artist_menu(artist):
     print("I - Info\nSL - Song List\nSI - Song Info\nA - Add Song\nR - Remove Song\nB - Back To Login\nX - Close Application\n;" )
     user_in = input("Input  Command: ")
     user_in = user_in.lower()
-    if user_in == "I":
-        be.Artist.info()
+    if user_in == "i":
+        be.Artist.info(artist)
     elif user_in == "sl":
         be.Artist.songs()
     elif user_in == "si":
@@ -230,7 +230,7 @@ def artist_start():
     mycursor.execute("select aID from artist where aName='%s';"% (aname))
     aID = mycursor.fetchall()
     print(aID)
-    artist = Artist(aID, mycursor)
+    artist = be.Artist(aID, mycursor)
     artist_menu(artist)
 
 # SUBSCRIBER LOGIN    
@@ -238,7 +238,7 @@ def sub_start():
     subName = input("Log In With Username or Exit: ")
     mycursor.execute("select subID from subscriber where subName='%s';"% (subName))
     subID =  mycursor.fetchall()
-    sub = Subscriber(subID, mycursor)
+    sub = be.Subscriber(subID, mycursor)
     sub_menu(sub)
 
 def start():
