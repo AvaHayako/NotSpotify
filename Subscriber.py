@@ -17,10 +17,9 @@ class Subscriber:
     # list songs in input playlist
     def list_songs(self, pID):
         self.c.execute("select S.sName from Song as S, Is_On as O where S.sID=O.sID and O.pID='%s';"% (pID))
-        print('ok')
         results = self.c.fetchall()
         self.c.execute("Select pName from Playlist where pID= '%s'"%(pID))
-        p = self.c.fetchall()
+        p = self.c.fetchall()[0][0]
         print(f"Songs on {p}")
         for x in results:
             print(x)
@@ -32,9 +31,9 @@ class Subscriber:
         self.db.commit()
         print("ok")
         self.c.execute("Select sName from Song where sID= '%s'"%(sID))
-        s = self.c.fetchall()[0]
+        s = self.c.fetchall()[0][0]
         self.c.execute("Select pName from Playlist where pID='%s'"%(pID))
-        p = self.c.fetchall()[0]
+        p = self.c.fetchall()[0][0]
         print(f"= {s} has been added to {p} =")
     
     # update playlsit privacy
@@ -42,7 +41,7 @@ class Subscriber:
         self.c.execute("update Playlist set privacy=%s where pID='%s';"% (privacy, pID))
         self.db.commit()
         self.c.execute("Select pName from Playlist where pID='%s'"%(pID))
-        p = self.c.fetchall()[0]
+        p = self.c.fetchall()[0][0]
         if (privacy == "TRUE"):
             print(f"= {p} is now public! =")
         else:
@@ -50,12 +49,12 @@ class Subscriber:
             
     # remove input song from input playlsit
     def remove_song(self, pID, sID):
-        self.c.execute("delete from Is_On where sID=%s and pID='%s';"% (sID, pID))
+        self.c.execute("delete from Is_On where sID=%s and pID=%s;"% (sID, pID))
         self.db.commit()
         self.c.execute("Select sName from Song where sID=%s"%(sID))
-        s = self.c.fetchall()[0]
+        s = self.c.fetchall()[0][0]
         self.c.execute("Select pName from Playlist where pID='%s'"%(pID))
-        p = self.c.fetchall()[0]
+        p = self.c.fetchall()[0][0]
         print(f"= {s} has been removed from {p} =")
         
     # follow input artist
@@ -63,7 +62,7 @@ class Subscriber:
         self.c.execute("insert into Follow values (%s,%s);"% (self.sub_ID, aID))
         self.db.commit()
         self.c.execute("Select aName from Artist where aID=%s"%(aID))
-        a = self.c.fetchall()[0]
+        a = self.c.fetchall()[0][0]
         print(f"= Followed {a} =")
     
     # unfollow input artist
@@ -90,7 +89,7 @@ class Subscriber:
     # remove a playlsit
     def remove_playlist(self, pID):
         self.c.execute("select P.pName from Playlist P where P.pID='%s';"% (pID))
-        pName = self.c.fetchall()[0]
+        pName = self.c.fetchall()[0][0]
         self.c.execute("delete from Playlist where pID=%s;"% (pID))
         self.c.execute("delete from Is_On where pID=%s;"% (pID))
         self.db.commit()
@@ -130,19 +129,19 @@ if __name__ == "__main__":
             file.close()
     except Exception as exc:
         print(exc)
-#    sub = Subscriber(1, mycursor, mydb)
-##    sub.add_playlist("Fyre Beatz")
-#    sub.playlists()
-#    sub.add_song("1FyreBeatz",'101WeRise')
-#    sub.list_songs("1FyreBeatz")
-#    sub.change_privacy("1FyreBeatz", "TRUE")
-#    sub.remove_song("1FyreBeatz", 101)
-#    sub.list_songs("1FyreBeatz")
-#    sub.remove_playlist("1FyreBeatz")
-#    sub.follow(101)
-#    sub.following()
-#    sub.unfollow(101)
-#    sub.following()
-#    
-#
-#    
+    sub = Subscriber(1, mycursor, mydb)
+    #sub.add_playlist("Fyre Beatz")
+    sub.playlists()
+    #sub.add_song("1FyreBeatz",'101WeRise')
+    sub.list_songs("1FyreBeatz")
+    sub.change_privacy("1FyreBeatz", "TRUE")
+    sub.remove_song("1FyreBeatz",'101WeRise')
+    sub.list_songs("1FyreBeatz")
+    sub.remove_playlist("1FyreBeatz")
+    sub.follow(101)
+    sub.following()
+    sub.unfollow(101)
+    sub.following()
+    
+
+    
