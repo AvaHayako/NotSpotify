@@ -26,7 +26,8 @@ class Subscriber:
     
     # add input song to input playlist
     def add_song(self, pID, sID):
-        self.c.execute("insert into Is_On values (%s,'%s');"% (sID, pID))
+        print("#############", pID,sID)
+        self.c.execute("insert into Not_Spotify.Is_On values (%s, %s);"% (sID, pID))
         self.db.commit()
         self.c.execute("Select sName from Song where sID=%s"%(sID))
         s = self.c.fetchall()[0]
@@ -75,8 +76,9 @@ class Subscriber:
     def playlists(self):
         self.c.execute("select P.pName from Playlist P where P.subID=%s;"% (self.sub_ID))
         results = self.c.fetchall()
+        print("Your Playlists:")
         for x in results:
-            print(x)
+            print(x[0])
 
     # create a new playlsit
     def add_playlist(self, pName):
@@ -110,8 +112,9 @@ if __name__ == "__main__":
         )
         mycursor = mydb.cursor()
         try:
-            mycursor.execute('USE final_project;')
+            mycursor.execute('USE NOT_SPOTIFY;')
         except Exception:
+            print("got here")
             file = open('not_spotify.sql', 'r')
             sql = s = " ".join(file.readlines())
             sql_lines = sql.replace('\n','').replace(';',';\n').split("\n")
@@ -128,7 +131,7 @@ if __name__ == "__main__":
     sub = Subscriber(1, mycursor, mydb)
     #sub.add_playlist("Fyre Beatz")
     sub.playlists()
-    sub.add_song("1FyreBeatz", 101)
+    sub.add_song('101WeRise',"1FyreBeatz")
     sub.list_songs("1FyreBeatz")
     sub.change_privacy("1FyreBeatz", "TRUE")
     sub.remove_song("1FyreBeatz", 101)
