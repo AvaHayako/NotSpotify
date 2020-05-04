@@ -55,11 +55,11 @@ class Artist:
         print(sID)
         print(type(sID))
         # list of command tuples = (<result identifier>, <SQL command>)
-        SQLcommands = [('Title:', "Select sName From song Where sID = %s;"),
-                    ('Publish date:', "Select publish_date From song Where sID = %s;"),
-                    ('Likes:', "Select like_count From song Where sID = %s;"),
+        SQLcommands = [('Title:', "Select sName From song Where sID = '%s';"),
+                    ('Publish date:', "Select publish_date From song Where sID = '%s';"),
+                    ('Likes:', "Select like_count From song Where sID = '%s';"),
                     ('Playlists with your song:', """Select P.pName From Playlist as P, Is_On as IO 
-                            Where IO.sID = %s and IO.pID = P.pID;""")]
+                            Where IO.sID = '%s' and IO.pID = P.pID;""")]
                     
         print('\n=== Your Song Info ===')
         for c in SQLcommands: 
