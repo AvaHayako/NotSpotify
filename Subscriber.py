@@ -77,8 +77,9 @@ class Subscriber:
     def playlists(self):
         self.c.execute("select P.pName from Playlist P where P.subID=%s;"% (self.sub_ID))
         results = self.c.fetchall()
+        print("Your Playlists:")
         for x in results:
-            print(x)
+            print(x[0])
 
     # create a new playlsit
     def add_playlist(self, pName):
@@ -112,8 +113,9 @@ if __name__ == "__main__":
         )
         mycursor = mydb.cursor()
         try:
-            mycursor.execute('USE final_project;')
+            mycursor.execute('USE NOT_SPOTIFY;')
         except Exception:
+            print("got here")
             file = open('not_spotify.sql', 'r')
             sql = s = " ".join(file.readlines())
             sql_lines = sql.replace('\n','').replace(';',';\n').split("\n")
