@@ -37,8 +37,7 @@ class Artist:
             for r in self.mc:
                 # print result identifier and result(s) 
                 print(c[0], r[0])      
-    
-    
+        
     # returns list of all song names
     def songs(self):
         self.mc.execute("Select sName from Song where aID = %d;"% (self.aID))  
@@ -76,23 +75,27 @@ class Artist:
                 for r in result:
                     print(r[0])
         print("\n")
+        
             
     # adds new song to database            
-    def add(self, sID, p_date = str(date.today())):
+    def add(self, sName, p_date = str(date.today())):
         # derive song name from sID
-        sName = sID.replace(str(self.aID),"")
+        sID = str(self.aID) + sName.strip()
         self.mc.execute("insert into Not_Spotify.Song values('%s', %d, '%s', '%s', 0);"% (sID, self.aID, sName, p_date))
         print('\nSong "%s" added!'% (sName))
         mydb.commit()
 
     
-    #
+    # removes song from database
     def remove(self, sID):
         # derive song name from sID
+        print(sID)
         sName = sID.replace(str(self.aID),"")
-        self.mc.execute("delete from Not_Spotify.Song where sID = '%s';"% (sID))
+        self.mc.execute("delete from Not_Spotify.Song where Song.sID = '%s';"% (sID))
         print('\nSong "%s" removed!'% (sName))
         mydb.commit()
+    
+    
         
 
 
@@ -115,9 +118,9 @@ mycursor.execute("USE NOT_SPOTIFY;")
 #=============================================================================         
 #a1 = Artist(102, mycursor)
 #a1.info()
-# a1.songs()
-# a1.song_info('"102Stronger"')
-#a1.add("102Nectar",p_date="2019/5/31")
+#a1.songs()
+# a1.song_info('"Stronger"')
+#a1.add("Poop")
 # =============================================================================
 
 
