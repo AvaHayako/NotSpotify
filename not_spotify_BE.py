@@ -5,22 +5,15 @@
 # for whatever type, gonna make another instance of the class
 # using whatever subid input it recieves.
 
-import dns
-import mysql.connector
+
 from datetime import date
 
-# Subscriber object
-class Sub:
-    def __init__(self, subID):
-        self.subID = subID
-    # songs in playlist
-    
 # Artist object
 class Artist:
-    def __init__(self, aID, mycursor):
+    def __init__(self, aID, mycursor, mydb):
         self.aID = aID
-        self.mc = mycursor
-    
+        self.mc = mycursor    
+        self.mydb = mydb
     
     # return artist name, song count, likes count, follower count
     def info(self):
@@ -83,17 +76,16 @@ class Artist:
         sID = str(self.aID) + sName.strip()
         self.mc.execute("insert into Not_Spotify.Song values('%s', %d, '%s', '%s', 0);"% (sID, self.aID, sName, p_date))
         print('\nSong "%s" added!'% (sName))
-        mydb.commit()
+        self.mydb.commit()
 
     
     # removes song from database
     def remove(self, sID):
         # derive song name from sID
-        print(sID)
         sName = sID.replace(str(self.aID),"")
         self.mc.execute("delete from Not_Spotify.Song where Song.sID = '%s';"% (sID))
         print('\nSong "%s" removed!'% (sName))
-        mydb.commit()
+        self.mydb.commit()
     
     
         
@@ -104,17 +96,19 @@ class Artist:
          
 # =====TESTING=====
 
-
-mydb = mysql.connector.connect(
-   host="localhost",
-   user="root",
-   passwd=".ec33x!FQ?6nM-8",
-   use_pure = True
- )
- 
-mycursor = mydb.cursor()
-#print(mydb)
-mycursor.execute("USE NOT_SPOTIFY;")
+# =============================================================================
+# 
+# mydb = mysql.connector.connect(
+#    host="localhost",
+#    user="root",
+#    passwd=".ec33x!FQ?6nM-8",
+#    use_pure = True
+#  )
+#  
+# mycursor = mydb.cursor()
+# #print(mydb)
+# mycursor.execute("USE NOT_SPOTIFY;")
+# =============================================================================
 #=============================================================================         
 #a1 = Artist(102, mycursor)
 #a1.info()
@@ -123,6 +117,4 @@ mycursor.execute("USE NOT_SPOTIFY;")
 #a1.add("Poop")
 # =============================================================================
 
-
-mydb.commit()
                               

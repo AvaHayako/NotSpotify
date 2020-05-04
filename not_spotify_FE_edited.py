@@ -174,7 +174,7 @@ def sub_menu(sub):
         try:
             mycursor.execute("select aID from Artist where aName='%s';"% (aname))
             aID = mycursor.fetchall()[0]
-            artist = Artist(aID, mycursor)
+            artist = Artist(aID, mycursor, mydb)
             artist_home(sub, artist, aname, aID)
         except Exception:
             print("Artist Not Found")
@@ -192,11 +192,11 @@ def sub_menu(sub):
 # ARTIST MENU    
 def artist_menu(artist):
     print('=== Artist Menu ===\n')
-    print("I - Info\nSL - Song List\nSI - Song Info\nA - Add Song\nR - Remove Song\nB - Back To Login\nX - Close Application\n;" )
+    print("I - Info\nSL - Song List\nSI - Song Info\nA - Add Song\nR - Remove Song\nB - Back To Login\nX - Close Application\n" )
     user_in = input("Input  Command: ")
     user_in = user_in.lower()
     if user_in == "i":
-        be.Artist.info()
+        be.Artist.info(artist)
         artist_menu(artist)
     elif user_in == "sl":
         be.Artist.songs(artist)
@@ -215,7 +215,7 @@ def artist_menu(artist):
     # ADD SONG
     elif user_in == "a":
         input_sName = input("Enter song name:")
-        input_p_Date = input("Enter publish date in format 'year-month-day', or enter\ntoday to default to today's date: ").lower()
+        input_p_Date = input("Enter publish date in format 'year-month-day',\nOR enter 'today' for today's date: ").lower()
         if input_p_Date == "today":
             try:
                 be.Artist.add(artist, input_sName)
@@ -264,7 +264,7 @@ def artist_start():
     mycursor.execute("select aID from artist where aName='%s';"% (aname))
     aID = mycursor.fetchall()[0][0]
     print(aID)
-    artist = be.Artist(aID, mycursor)
+    artist = be.Artist(aID, mycursor,mydb=mydb)
     artist_menu(artist)
 
 # SUBSCRIBER LOGIN    
