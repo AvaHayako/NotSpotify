@@ -2,6 +2,7 @@
 
 import mysql.connector
 import not_spotify_BE as be
+from Subscriber import Subscriber
 from dateutil.parser import parse
 
 
@@ -11,11 +12,10 @@ path = 'C:/Users/Ava/Desktop/CS 220 Materials/CSCI220-Final-Project/'
 def playlist(sub, pName, pID):
     print(f'=== {pName} ===\n')
     print("L - List Songs\nS - Search Songs\nA - Add Song\nR - Remove Song\nB - Back")
-    user_in = input("Input  Command: ")
-    user_in = user_in.lower()
+    user_in = input("Input  Command: ").lower()
     # list
     if user_in == "l":
-        be.Sub.list_songs(pID)
+        sub.list_songs(pID)
         playlist(sub, pName, pID)
     # search
     elif user_in == "s":
@@ -31,10 +31,10 @@ def playlist(sub, pName, pID):
             if len(mycursor.execute("select sID from Is_On where pID=%d and sID=%d;"% (pID, sID)).fetchall()) > 0:
                 print("Song Already In Playlist")
             else:
-                be.Sub.add_song(pID, sID)
+                sub.add_song(pID, sID)
         except Exception:
             print("Song Not Found")
-        be.Sub.add_song(pID, sID)
+        sub.add_song(pID, sID)
         playlist(sub, pName, pID)
     # remove
     elif user_in == "r":
@@ -46,7 +46,7 @@ def playlist(sub, pName, pID):
             if len(mycursor.execute("select sID from Is_On where pID=%d and sID=%d;"% (pID, sID)).fetchall()) == 0:
                 print("Song Not In Playlist")
             else:
-                be.Sub.remove_song(pID, sID)
+                sub.remove_song(pID, sID)
         except Exception:
             print("Song Not Found")
         playlist(sub, pName, pID)
@@ -75,11 +75,11 @@ def artist_home(sub, artist, aname, aID):
             artist_home(sub, artist, aname, aID)
         # Follow
         elif user_in == "f":
-            be.Sub.follow(aID)
+            sub.follow(aID)
             artist_home(sub, artist, aname, aID)
             # Unfollow
         elif user_in == "f":
-            be.Sub.unfollow(aID)
+            sub.unfollow(aID)
             artist_home(sub, artist, aname, aID)
         elif user_in == "b":
             sub_menu(sub)
@@ -105,32 +105,30 @@ def a_search():
     
 # SUBSCRIBER MENU    
 def sub_menu(sub):
-    print('=== Subscriber Menu ===\n')
-    print("""L - Likes\nP - List Playlists\nF - List Followed Artists\nEP - Edit Playlist\nAP - Add Playlist\n
-          RP - Remove Playlist\nS - Search Songs\nSA - Search Artists\nA - Vew Artist Home\n
-          B - Back To Login\nX - Close Application\n""" )
+    print('=== subscriber Menu ===\n')
+    print("""L - Likes\nP - List Playlists\nF - List Followed Artists\nEP - Edit Playlist\nAP - Add Playlist\nRP - Remove Playlist\nS - Search Songs\nSA - Search Artists\nA - Vew Artist Home\nB - Back To Login\nX - Close Application\n""" )
     user_in = input("Input  Command: ")
     user_in = user_in.lower()
     # run playlist menu for likes playlist
     if user_in == "l":
         mycursor.execute('select pID from Playlist where pName="Likes";')
-        pID = mycursor.fetchall()[0]
+        pID = mycursor.fetchall()
         playlist(sub, "Likes", pID)
         sub_menu(sub)
     # list playlists
     elif user_in == "p":
-        be.Sub.playlists()
+        sub.playlists()
         sub_menu(sub)
     # edit playlist
     elif user_in == "ep":
         # get playlsit name from user
-        pName = input("Input Name of Playlist You Would Like to Edit: ")
+        input_pName = input("Input Name of Playlist You Would Like to Edit: ")
         try:
             # find related id
-            mycursor.execute("select pID from Playlist where pName='%s';"% (pName))
+            mycursor.execute("select pID from Playlist where pName='%s';"% (input_pName))
             pID = mycursor.fetchall()[0]
             # run playist menu for input playlist
-            playlist(sub, pName, pID)
+            playlist(sub, input_pName, pID)
         except Exception:
             print("Playlist Not Found")
         sub_menu(sub)
@@ -141,22 +139,23 @@ def sub_menu(sub):
     elif user_in == "ap":
         input_pName = input("Enter Playlist name:")
         try:
-            if len(mycursor.execute("select pID from Playlist where pName='%s';"% (pName)).fetchall()) > 0:
+            mycursor.execute("select pID from Playlist where pName='%s';"% (input_pName))
+            if len(mycursor.fetchall()) > 0:
                 print("Name Already Taken")
             else:
-                be.Sub.add_playlist(pName)
+                sub.add_playlist(input_pName)
         except Exception as e:
             print(e)
         sub_menu(sub)
     # remove playlist
-    elif user_in == "ap":
+    elif user_in == "rp":
         input_pName = input("Enter Playlist name:")
         try:
-            pID = mycursor.execute("select pID from Playlist where pName='%s';"% (pName)).fetchall()
-            if len(pID) == 0:
+            mycursor.execute("select pID from Playlist where pName='%s';"% (input_pName))
+            if len(mycursor.fetchall()) > 0:
                 print("No Such Playlist")
             else:
-                be.Sub.remove_playlist(pID)
+                sub.remove_playlist(pID)
         except Exception as e:
             print(e)
         sub_menu(sub)
@@ -272,12 +271,12 @@ def sub_start():
     subName = input("Log In With Username or Exit: ")
     mycursor.execute("select subID from subscriber where subName='%s';"% (subName))
     subID =  mycursor.fetchall()[0][0]
-    sub = be.Subscriber(subID, mycursor)
+    sub = Subscriber(subID, mycursor,mydb)
     sub_menu(sub)
 
 def start():
     print("========== Welcome To Not Spotify ==========")
-    login_type = input("Type 'S' for Subscriber login or 'A' for Artist Login: ")
+    login_type = input("Type 'S' for subscriber login or 'A' for Artist Login: ")
     login_type = login_type.lower()
     if login_type == "a":
         artist_start()
@@ -317,6 +316,8 @@ if __name__ == "__main__":
         start()
     except Exception as exc:
         print(exc)
+
+
 
 
 

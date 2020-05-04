@@ -16,10 +16,11 @@ class Subscriber:
         self.c = cursor
     # list songs in input playlist
     def list_songs(self, pID):
-        self.c.execute("select S.sName from Song S, Is_On O where S.sID=O.sID and O.pID=%s;"% (pID))
+        self.c.execute("select S.sName from Song as S, Is_On as O where S.sID=O.sID and O.pID='%s';"% (pID))
+        print('ok')
         results = self.c.fetchall()
-        self.c.execute("Select pName from Playlist where pID=%s"%(pID))
-        p = self.c.fetchall()[0]
+        self.c.execute("Select pName from Playlist where pID= '%s'"%(pID))
+        p = self.c.fetchall()
         print(f"Songs on {p}")
         for x in results:
             print(x)
@@ -30,7 +31,7 @@ class Subscriber:
         self.c.execute("insert into Is_On values ('%s','%s');"% (sID, pID))
         self.db.commit()
         print("ok")
-        self.c.execute("Select sName from Song where sID=%s"%(sID))
+        self.c.execute("Select sName from Song where sID= '%s'"%(sID))
         s = self.c.fetchall()[0]
         self.c.execute("Select pName from Playlist where pID='%s'"%(pID))
         p = self.c.fetchall()[0]
@@ -108,7 +109,7 @@ if __name__ == "__main__":
         mydb = mysql.connector.connect(
           host="localhost",
           user="root",
-          passwd="nimitchell220",
+          passwd=".ec33x!FQ?6nM-8",
           use_pure = True
         )
         mycursor = mydb.cursor()
@@ -129,19 +130,19 @@ if __name__ == "__main__":
             file.close()
     except Exception as exc:
         print(exc)
-    sub = Subscriber(1, mycursor, mydb)
-    #sub.add_playlist("Fyre Beatz")
-    sub.playlists()
-    sub.add_song('101WeRise',"1FyreBeatz")
-    sub.list_songs("1FyreBeatz")
-    sub.change_privacy("1FyreBeatz", "TRUE")
-    sub.remove_song("1FyreBeatz", 101)
-    sub.list_songs("1FyreBeatz")
-    sub.remove_playlist("1FyreBeatz")
-    sub.follow(101)
-    sub.following()
-    sub.unfollow(101)
-    sub.following()
-    
-
-    
+#    sub = Subscriber(1, mycursor, mydb)
+##    sub.add_playlist("Fyre Beatz")
+#    sub.playlists()
+#    sub.add_song("1FyreBeatz",'101WeRise')
+#    sub.list_songs("1FyreBeatz")
+#    sub.change_privacy("1FyreBeatz", "TRUE")
+#    sub.remove_song("1FyreBeatz", 101)
+#    sub.list_songs("1FyreBeatz")
+#    sub.remove_playlist("1FyreBeatz")
+#    sub.follow(101)
+#    sub.following()
+#    sub.unfollow(101)
+#    sub.following()
+#    
+#
+#    
