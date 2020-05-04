@@ -2,6 +2,8 @@
 
 import mysql.connector
 import not_spotify_BE as be
+from dateutil.parser import parse
+
 
 path = 'C:/Users/Ava/Desktop/CS 220 Materials/CSCI220-Final-Project/'
 
@@ -104,7 +106,9 @@ def a_search():
 # SUBSCRIBER MENU    
 def sub_menu(sub):
     print('=== Subscriber Menu ===\n')
-    print("L - Likes\nP - List Playlists\nEP - Edit Playlist\nAP - Add Playlist\nRP - Remove Playlist\nS - Search Songs\nSA - Search Artists\nA - Vew Artist Home\nB - Back To Login\nX - Close Application\n" )
+    print("""L - Likes\nP - List Playlists\nF - List Followed Artists\nEP - Edit Playlist\nAP - Add Playlist\n
+          RP - Remove Playlist\nS - Search Songs\nSA - Search Artists\nA - Vew Artist Home\n
+          B - Back To Login\nX - Close Application\n""" )
     user_in = input("Input  Command: ")
     user_in = user_in.lower()
     # run playlist menu for likes playlist
@@ -130,6 +134,9 @@ def sub_menu(sub):
         except Exception:
             print("Playlist Not Found")
         sub_menu(sub)
+    # list followed artists
+    elif user_in == "f":
+        sub.following()
     # add playlist
     elif user_in == "ap":
         input_pName = input("Enter Playlist name:")
@@ -145,10 +152,11 @@ def sub_menu(sub):
     elif user_in == "ap":
         input_pName = input("Enter Playlist name:")
         try:
-            if len(mycursor.execute("select pID from Playlist where pName='%s';"% (pName)).fetchall()) == 0:
+            pID = mycursor.execute("select pID from Playlist where pName='%s';"% (pName)).fetchall()
+            if len(pID) == 0:
                 print("No Such Playlist")
             else:
-                be.Sub.remove_playlist(pName)
+                be.Sub.remove_playlist(pID)
         except Exception as e:
             print(e)
         sub_menu(sub)
@@ -188,11 +196,12 @@ def artist_menu(artist):
     user_in = input("Input  Command: ")
     user_in = user_in.lower()
     if user_in == "i":
-        be.Artist.info(artist)
+        be.Artist.info()
         artist_menu(artist)
     elif user_in == "sl":
         be.Artist.songs(artist)
         artist_menu(artist)
+    # RETRIEVE SONG INFO
     elif user_in == "si":
         input_sName = input("Enter song name:")
         try:
@@ -203,21 +212,38 @@ def artist_menu(artist):
             artist_menu(artist)
         except Exception:
             print("Song Not Found")
+    # ADD SONG
     elif user_in == "a":
         input_sName = input("Enter song name:")
-        try:
-            be.Artist.add(input_sName)
-            artist_menu(artist)
-        except Exception:
-            print("Invalid Song Name")
-            artist_menu(artist)
+        input_p_Date = input("Enter publish date in format 'year-month-day', or enter\ntoday to default to today's date: ").lower()
+        if input_p_Date == "today":
+            try:
+                be.Artist.add(artist, input_sName)
+                artist_menu(artist)
+            except Exception:
+                print("Invalid Song Name")
+                artist_menu(artist)
+        else:
+             try: 
+                 parse(input_p_Date, fuzzy=False)
+                 try:
+                     be.Artist.add(artist, input_sName, p_date = input_p_Date)
+                     artist_menu(artist)
+                 except Exception:
+                     print("Invalid Song Name")
+                     artist_menu(artist)
+             except ValueError:
+                 print("Invalid Date")
+                 artist_menu(artist)
+
+    # REMOVE SONG
     elif user_in == "r":
         input_sName = input("Enter song name:")
         try:
             mycursor.execute("select sID from Song where sName='%s';"% (input_sName))
-            sID = mycursor.fetchall()[0]
+            sID = mycursor.fetchall()[0][0]
             try:
-                be.Artist.song_info(sID)
+                be.Artist.remove(artist, sID)
                 artist_menu(artist)
             except Exception as e:
                 print(e)
@@ -236,7 +262,7 @@ def artist_menu(artist):
 def artist_start():
     aname = input("Log In With Username or Exit: ")
     mycursor.execute("select aID from artist where aName='%s';"% (aname))
-    aID = mycursor.fetchall()[0]
+    aID = mycursor.fetchall()[0][0]
     print(aID)
     artist = be.Artist(aID, mycursor)
     artist_menu(artist)
@@ -245,7 +271,7 @@ def artist_start():
 def sub_start():
     subName = input("Log In With Username or Exit: ")
     mycursor.execute("select subID from subscriber where subName='%s';"% (subName))
-    subID =  mycursor.fetchall()[0]
+    subID =  mycursor.fetchall()[0][0]
     sub = be.Subscriber(subID, mycursor)
     sub_menu(sub)
 

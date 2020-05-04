@@ -17,7 +17,7 @@ create table if not exists Playlist (
     subID int,
 	pName varchar(50),
     privacy boolean,
-    FOREIGN KEY (subID) REFERENCES Subscriber(subID)
+    FOREIGN KEY (subID) REFERENCES Subscriber(subID) ON DELETE CASCADE
 );
 
 create table if not exists Song (
@@ -26,23 +26,23 @@ create table if not exists Song (
     sName varchar(50),
     publish_date date,
     like_count int DEFAULT 0,
-    FOREIGN KEY (aID) REFERENCES Artist(aID)
+    FOREIGN KEY (aID) REFERENCES Artist(aID) ON DELETE CASCADE
     );
 
  create table if not exists Follow (
 	subID int,
     aID int,
  	PRIMARY KEY(subID, aID),
-	FOREIGN KEY (subID) REFERENCES Subscriber(subID),
-	FOREIGN KEY (aID) REFERENCES Artist(aID)
+	FOREIGN KEY (subID) REFERENCES Subscriber(subID) ON DELETE CASCADE,
+	FOREIGN KEY (aID) REFERENCES Artist(aID) ON DELETE CASCADE
 );
 
 create table if not exists Is_On (
 	sID varchar(50),
     pID varchar(50),
 	PRIMARY KEY (sID, pID),
-	FOREIGN KEY (sID) REFERENCES Song(sID),
-    FOREIGN KEY (pID) REFERENCES Playlist(pID)
+	FOREIGN KEY (sID) REFERENCES Song(sID) ON DELETE CASCADE,
+    FOREIGN KEY (pID) REFERENCES Playlist(pID) ON DELETE CASCADE
     );
     
 
