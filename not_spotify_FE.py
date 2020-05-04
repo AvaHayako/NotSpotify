@@ -1,6 +1,10 @@
 
 import mysql.connector
 
+
+
+
+# TO CREATE A PLAYLIST
 def playlist(sub, name, pid):
     print(f'=== {name} ===\n')
     print("L - List Songs\nS - Search Songs\nA - Add Song\nR - Remove Song\nB - Back")
@@ -233,7 +237,7 @@ def sub_start():
 
 def start():
     print("========== Welcome To Not Spotify ==========")
-    login_type = input("Type S for ubscriber login or A for Artist Login: ")
+    login_type = input("Type 'S' for Subscriber login or A for Artist Login: ")
     login_type = login_type.lower()
     if login_type == "a":
         artist_start()
@@ -249,9 +253,9 @@ if __name__ == "__main__":
         mydb = mysql.connector.connect(
           host="localhost",
           user="root",
-          passwd="nimitchell220",
-          use_pure=True
-          )
+          passwd=".ec33x!FQ?6nM-8",
+          use_pure = True
+        )
         mycursor = mydb.cursor()
         try:
             mycursor.execute('USE final_project;')
