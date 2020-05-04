@@ -5,7 +5,7 @@
 # for whatever type, gonna make another instance of the class
 # using whatever subid input it recieves.
 
-import dns
+#import dns
 import mysql.connector
 from datetime import date
 

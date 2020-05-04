@@ -1,6 +1,7 @@
 
 import mysql.connector
-
+from backEnd import Artist
+from backEnd import Subscriber
 def playlist(sub, name, pid):
     print(f'=== {name} ===\n')
     print("L - List Songs\nS - Search Songs\nA - Add Song\nR - Remove Song\nB - Back")
