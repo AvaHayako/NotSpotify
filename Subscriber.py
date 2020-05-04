@@ -20,7 +20,7 @@ class Subscriber:
         print('ok')
         results = self.c.fetchall()
         self.c.execute("Select pName from Playlist where pID= '%s'"%(pID))
-        p = self.c.fetchall()
+        p = self.c.fetchall()[0]
         print(f"Songs on {p}")
         for x in results:
             print(x)

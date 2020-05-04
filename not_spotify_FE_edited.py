@@ -26,24 +26,26 @@ def playlist(sub, pName, pID):
         input_sName = input("Enter song name:")
         try:
             mycursor.execute("select sID from Song where sName='%s';"% (input_sName))
-            sID = mycursor.fetchall()[0]
+            sID = mycursor.fetchall()[0][0]
             # check if song already on playlist
-            if len(mycursor.execute("select sID from Is_On where pID=%d and sID=%d;"% (pID, sID)).fetchall()) > 0:
+            mycursor.execute("select sID from Is_On where pID='%s' and sID='%s';"% (pID, sID))
+            if len(mycursor.fetchall()) > 0:
                 print("Song Already In Playlist")
             else:
                 sub.add_song(pID, sID)
-        except Exception:
+        except Exception as e:
+            print(e)
             print("Song Not Found")
-        sub.add_song(pID, sID)
         playlist(sub, pName, pID)
     # remove
     elif user_in == "r":
         input_sName = input("Enter song name:")
         try:
             mycursor.execute("select sID from Song where sName='%s';"% (input_sName))
-            sID = mycursor.fetchall()[0]
+            sID = mycursor.fetchall()[0][0]
             # check if song is on playlist
-            if len(mycursor.execute("select sID from Is_On where pID=%d and sID=%d;"% (pID, sID)).fetchall()) == 0:
+            mycursor.execute("select sID from Is_On where pID='%s' and sID='%s';"% (pID, sID))
+            if len(mycursor.fetchall()) > 0:
                 print("Song Not In Playlist")
             else:
                 sub.remove_song(pID, sID)
@@ -90,7 +92,8 @@ def artist_home(sub, artist, aname, aID):
 # SEARCH FUNCTION            
 def search():
     querry = input("Search: ")
-    querry = '"' + querry + "%" + '"'
+    querry = '"' + querry + '%' + '"'
+    #querry = '"'
     mycursor.execute("select sName from Song where sName like '%s';"% (querry))
     for x in mycursor:
         print(x)
@@ -112,7 +115,7 @@ def sub_menu(sub):
     # run playlist menu for likes playlist
     if user_in == "l":
         mycursor.execute('select pID from Playlist where pName="Likes";')
-        pID = mycursor.fetchall()
+        pID = mycursor.fetchall()[0][0]
         playlist(sub, "Likes", pID)
         sub_menu(sub)
     # list playlists
@@ -272,7 +275,11 @@ def sub_start():
     mycursor.execute("select subID from subscriber where subName='%s';"% (subName))
     subID =  mycursor.fetchall()[0][0]
     sub = Subscriber(subID, mycursor,mydb)
-    sub_menu(sub)
+    try:
+        sub.add_playlist('Likes')
+        sub_menu(sub)
+    except: 
+        sub_menu(sub)
 
 def start():
     print("========== Welcome To Not Spotify ==========")
