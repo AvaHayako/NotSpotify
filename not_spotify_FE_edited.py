@@ -199,7 +199,8 @@ def artist_menu(artist):
             mycursor.execute("select sID from Song where sName='%s';"% (input_sName))
             sID = mycursor.fetchall()[0][0]
             print("sID is: ", sID)
-            be.Artist.song_info(sID)
+            be.Artist.song_info(artist, sID)
+            artist_menu(artist)
         except Exception:
             print("Song Not Found")
     elif user_in == "a":
